@@ -1,6 +1,8 @@
 import argparse
 import glob
-from fitness import sportstatistics as sport
+from fitness.sportstatistics import SportStatistics
+from fitness.fitfilereader import FitFileReader
+
 
 class Application(object):
     def __init__(self) -> None:
@@ -16,10 +18,12 @@ class Application(object):
         return self.parser.parse_args()
     
     def display_statistics(self, args):
-        statistic = sport.SportStatistics()
+        statistic = SportStatistics()
         # for fitfile in glob.glob(f"{args['directory']}/20221215.fit"):
         for fitfile in glob.glob(f"{args['directory']}/*.fit"):
-            statistic.insert(fitfile)
+            reader = FitFileReader()
+            for session in reader.parse(fitfile):
+                statistic.insert(session)
         print(statistic)
 
 if __name__ == '__main__':

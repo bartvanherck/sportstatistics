@@ -8,12 +8,8 @@ class SportStatistics(object):
         self.__sports = list()
         self.sessions = list()
 
-    def insert(self, fit_file):
-        reader = FitFileReader()
-        for session in reader.parse(fit_file):
-            # self.__sports.append(session.sport)
-            self.add_session(session)
-
+    def insert(self, session):
+        self.add_session(session)
         self.__sports = list(set([sport for sport,_ in self.sessions]))
         self.__sports.sort()
     
