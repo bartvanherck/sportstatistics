@@ -24,9 +24,9 @@ class Application(object):
         self.parser.add_argument('-s', '--statistics', action='store_true')
         self.parser.add_argument('-gi', '--generate_image', action='store_true')
         self.parser.add_argument('-f', '--fitfile', default='/home/bart/Downloads/fit/20221225_Lopen.fit')
-        self.parser.add_argument('-i', '--input_image', default='/home/bart/Downloads/fotos/cat.JPG')
+        self.parser.add_argument('-i', '--input_image', default='/home/bart/Downloads/fotos/1.JPG')
         self.parser.add_argument('-o', '--output_image', default='/home/bart/Downloads/fotos/result.JPG')
-        self.parser.add_argument('-r', '--rgb', type=tuple_type, default='(255,255,0')
+        self.parser.add_argument('-rt', '--rgb_text', type=tuple_type, default='(255,255,0')
         self.parser.add_argument('-m', '--generate_map', action='store_true')
 
     def parse_args(self):
@@ -65,5 +65,5 @@ if __name__ == '__main__':
                     input=args.input_image,
                     output=args.output_image,
                     map=args.generate_map,
-                    text_color=args.rgb
+                    text_color=args.rgb_text
                 ))
