@@ -1,22 +1,31 @@
 from PIL import Image, ImageDraw, ImageFont
 
 class SportImage(object):
-    def __init__(self, statistics, points, text_color=(0,0,0)) -> None:
+    def __init__(self, statistics, traces, text_color=(0,0,0), track_color=(0,0,0)) -> None:
         self.statistics = statistics
+        self.traces = traces
         self.font_title = ImageFont.truetype('Ubuntu-R.ttf', 35)
         self.font_text = ImageFont.truetype('Ubuntu-B.ttf', 40)
         self.text_color = text_color
+        self.track_color = track_color
         self.width = 1200
-        self.height = 800
+        self.height = 900
         self.horizontal = True
         self.coords = [20,15]
 
-    def draw(self, infile, outfile, withmap=False):
+    def draw(self, infile, outfile, offsets, withmap=False):
         image = Image.open(infile)
         image = self.normalize(image)
         self.text_on_image(image)
+        if withmap:
+            self.draw_path(image, offsets["x"], offsets["y"])
         image.save(outfile, quality=95)
     
+    def draw_path(self, image, offset_x=40, offset_y=40):
+        draw = ImageDraw.Draw(image)
+        shape = self.traces.get_shape(max_height=image.height, offset_x=offset_x, offset_y=offset_y)
+        draw.line(shape, fill=self.track_color, width=4)
+
     def place_text(self, img, coord ,titleText, content):
         img.text(tuple(coord), titleText, fill=self.text_color, font=self.font_title)
         coord[1] += 45
