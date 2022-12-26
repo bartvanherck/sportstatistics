@@ -1,4 +1,3 @@
-from .fitfilereader import FitFileReader
 from .utils import name_of_month
 from collections import Counter, OrderedDict, defaultdict
 

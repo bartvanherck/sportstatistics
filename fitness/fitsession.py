@@ -1,3 +1,9 @@
+from enum import Enum
+
+class FitDataType(Enum):
+    SESSION = 1
+    RECORD = 2
+
 class FitSession(object):
     def __init__(self, frame):
         self.sport = frame.get_value('sport')

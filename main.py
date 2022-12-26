@@ -2,6 +2,7 @@ import argparse
 import glob
 from fitness.sportstatistics import SportStatistics
 from fitness.fitfilereader import FitFileReader
+from fitness.fitsession import FitDataType
 
 
 class Application(object):
@@ -22,8 +23,9 @@ class Application(object):
         # for fitfile in glob.glob(f"{args['directory']}/20221215.fit"):
         for fitfile in glob.glob(f"{args['directory']}/*.fit"):
             reader = FitFileReader()
-            for session in reader.parse(fitfile):
-                statistic.insert(session)
+            for session_type, session in reader.parse(fitfile):
+                if session_type is FitDataType.SESSION:
+                    statistic.insert(session)
         print(statistic)
 
 if __name__ == '__main__':
