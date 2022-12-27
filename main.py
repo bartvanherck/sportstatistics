@@ -1,5 +1,6 @@
 import argparse
 import glob
+from pathlib import Path
 from fitness.sportstatistics import SportStatistics
 from fitness.fitfilereader import FitFileReader
 from fitness.fitsession import FitDataType
@@ -20,16 +21,17 @@ class Application(object):
         self.traces = Traces()
     
     def arguments(self):
-        self.parser.add_argument('-d', '--directory', default='/home/bart/Downloads/fit')
-        self.parser.add_argument('-s', '--statistics', action='store_true')
+        self.parser.add_argument('-d', '--directory', default='~/Downloads')
+        self.parser.add_argument('-gs', '--statistics', action='store_true')
         self.parser.add_argument('-gi', '--generate_image', action='store_true')
-        self.parser.add_argument('-f', '--fitfile', default='/home/bart/Downloads/fit/20221225_Lopen.fit')
-        self.parser.add_argument('-i', '--input_image', default='/home/bart/Downloads/fotos/2.JPG')
-        self.parser.add_argument('-o', '--output_image', default='/home/bart/Downloads/fotos/result.JPG')
+        self.parser.add_argument('-f', '--fitfile', default='lopen.fit')
+        self.parser.add_argument('-i', '--input_image', default='input.jpg')
+        self.parser.add_argument('-o', '--output_image', default='output.jpg')
         self.parser.add_argument('-te', '--rgb_text', type=tuple_type, default='(255,255,0')
         self.parser.add_argument('-tr', '--rgb_track', type=tuple_type, default='(255,255,0')
         self.parser.add_argument('-fx', '--offset_x', default=30, type=int)
         self.parser.add_argument('-fy', '--offset_y', default=30, type=int)
+        self.parser.add_argument('-st', '--max_trace_size', default=400, type=int)
         self.parser.add_argument('-m', '--generate_map', action='store_true')
 
     def parse_args(self):
@@ -45,7 +47,6 @@ class Application(object):
                 self.traces.insert(record)
 
     def display_statistics(self, args):
-        # for fitfile in glob.glob(f"{args['directory']}/20221215.fit"):
         for fitfile in glob.glob(f"{args['directory']}/*.fit"):
             self.append_statistic_from_fit_file(fitfile)
                 
@@ -58,19 +59,41 @@ class Application(object):
         image = SportImage(self.statistics, self.traces, 
                             text_color=args['text_color'],
                             track_color=args['track_color'])
-        image.draw(args['input'], args['output'], args['offsets'], args['map'])
+        image.draw(args['input'], args['output'],
+                    args['offsets'], args['map'],
+                    args['max_trace_size'])
 
+def create_file_path(directory, filename, check=True):
+    p = Path(f"{directory}/{filename}")
+    if not check:
+        return p.absolute()
+
+    if p.is_file():
+            return p.absolute()
+    return None
+    
 if __name__ == '__main__':
     app = Application()
     args = app.parse_args()
     if args.statistics:
         app.display_statistics(dict(directory=args.directory))
     if args.generate_image:
-        app.draw_on_image(dict(fitfile=args.fitfile,
-                    input=args.input_image,
-                    output=args.output_image,
-                    map=args.generate_map,
-                    text_color=args.rgb_text,
-                    track_color=args.rgb_track,
-                    offsets=dict(x=args.offset_x, y=args.offset_y)
-                ))
+        fitfile = create_file_path(args.directory,args.fitfile)
+        input_image = create_file_path(args.directory,args.input_image)
+        output_image = create_file_path(args.directory,args.output_image, check=False)
+        if (output_image is not None) and (input_image is not None) and (fitfile is not None):
+            app.draw_on_image(dict(fitfile=fitfile,
+                        input=input_image,
+                        output=output_image,
+                        map=args.generate_map,
+                        text_color=args.rgb_text,
+                        track_color=args.rgb_track,
+                        offsets=dict(x=args.offset_x, y=args.offset_y),
+                        max_trace_size=args.max_trace_size
+                    ))
+        else:
+            print("One of the following files does not exist")
+            print(f"directory: {args.directory}")
+            print(f"fitfile = {args.fitfile} => {fitfile}")
+            print(f"input_image = {args.input_image} => {input_image}")
+            print(f"output_image = {args.output_image} => {output_image}")

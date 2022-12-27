@@ -48,16 +48,21 @@ class Traces(object):
         mapper = list(range(max_coord,-1,-1))
         return mapper[c]
 
-    def get_shape(self, max_height=900, offset_x=40, offset_y=0, max_size=400):
-        offset_lat = max_height - max_size - offset_y
-        offset_long = offset_x
+    def get_max_coordinate_from_trace(self):
+        points_long = self.points_longitude()
+        points_lat = self.points_latitude()
+        if max(points_lat) > max(points_long):
+            return self.max_coord_latitude - self.min_coord_latitude
+        else:
+            return self.max_coord_longitude - self.min_coord_longitude
 
-        max_right = self.max_coord_longitude - self.min_coord_longitude
-        longs = (self.__calculate_coord(l, max_right, max_size) for l in self.points_longitude())
-        max_right = self.max_coord_latitude - self.min_coord_latitude
-        lats = (self.__calculate_coord(l, max_right, max_size) for l in self.points_latitude())
-        
-        longs_mapped = [l + offset_long for l in longs]
-        lats_mapped = [self.reverse_coordinate(c, max_size) + offset_lat for c in lats]
-        path = list(zip(longs_mapped,lats_mapped))
-        return path
+    def get_shape(self, max_height=900, offset_x=40, offset_y=0, max_size=500):
+        offset = dict(lat=max_height - max_size -offset_y, long=offset_x)
+        max_coord = self.get_max_coordinate_from_trace()
+        all_coord_long = (self.__calculate_coord(l, max_coord, max_size) for l in self.points_longitude())
+        all_coord_lat = (self.__calculate_coord(l, max_coord, max_size) for l in self.points_latitude())
+
+        shifted_coord_long = (l + offset["long"] for l in all_coord_long)
+        shifted_coord_lat = (self.reverse_coordinate(l, max_size) + offset["lat"] for l in all_coord_lat)
+
+        return list(zip(shifted_coord_long, shifted_coord_lat))

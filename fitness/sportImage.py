@@ -13,17 +13,17 @@ class SportImage(object):
         self.horizontal = True
         self.coords = [20,15]
 
-    def draw(self, infile, outfile, offsets, withmap=False):
+    def draw(self, infile, outfile, offsets, withmap=False, max_path_size=400):
         image = Image.open(infile)
         image = self.normalize(image)
         self.text_on_image(image)
         if withmap:
-            self.draw_path(image, offsets["x"], offsets["y"])
+            self.draw_path(image, offsets["x"], offsets["y"], max_path_size)
         image.save(outfile, quality=95)
     
-    def draw_path(self, image, offset_x=40, offset_y=40):
+    def draw_path(self, image, offset_x=40, offset_y=40, max_size=700):
         draw = ImageDraw.Draw(image)
-        shape = self.traces.get_shape(max_height=image.height, offset_x=offset_x, offset_y=offset_y)
+        shape = self.traces.get_shape(max_height=image.height, offset_x=offset_x, offset_y=offset_y, max_size=max_size)
         draw.line(shape, fill=self.track_color, width=4)
 
     def place_text(self, img, coord ,titleText, content):
