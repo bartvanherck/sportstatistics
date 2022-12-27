@@ -1,17 +1,20 @@
 
 class Traces(object):
     def __init__(self):
-        self.points = list()
-        self.min_coord_longitude = None
-        self.max_coord_longitude = None
-        self.min_coord_latitude = None
-        self.max_coord_latitude = None
-    
+        self.reset()
+        
     def insert(self, item):
         if item.value is not None:
             self.points.append(item)
             self.initialize_min_max(item.value)
             self.set_max_min_values(item.value)
+    
+    def reset(self):
+        self.points = list()
+        self.min_coord_longitude = None
+        self.max_coord_longitude = None
+        self.min_coord_latitude = None
+        self.max_coord_latitude = None
     
     def __calculate_coord(self, c, m, l):
         return int(c / m * l)

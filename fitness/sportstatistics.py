@@ -4,14 +4,17 @@ from collections import Counter, OrderedDict, defaultdict
 
 class SportStatistics(object):
     def __init__(self) -> None:
-        self.__sports = list()
-        self.sessions = list()
+        self.reset()
 
     def insert(self, session) -> None:
         self.add_session(session)
         self.__sports = list(set([sport for sport,_ in self.sessions]))
         self.__sports.sort()
     
+    def reset(self) -> None:
+        self.__sports = list()
+        self.sessions = list()
+
     def add_session(self, session) -> None:
         dates = [s.start_day for _,s in self.sessions]
         if session.start_day not in dates:

@@ -47,12 +47,15 @@ class Application(object):
                 self.traces.insert(record)
 
     def display_statistics(self, args):
+        self.statistics.reset()
         for fitfile in glob.glob(f"{args['directory']}/*.fit"):
             self.append_statistic_from_fit_file(fitfile)
                 
         print(self.statistics)
     
     def draw_on_image(self, args):
+        self.statistics.reset()
+        self.traces.reset()
         for fitfile in glob.glob(f"{args['fitfile']}"):
             self.append_statistic_from_fit_file(fitfile)
         
