@@ -24,7 +24,7 @@ class Application(object):
         self.parser.add_argument('-d', '--directory', default='~/Downloads')
         self.parser.add_argument('-gs', '--statistics', action='store_true')
         self.parser.add_argument('-gi', '--generate_image', action='store_true')
-        self.parser.add_argument('-f', '--fitfile', default='lopen.fit')
+        self.parser.add_argument('-f', '--fitfile', default='lopen.fit', nargs="+")
         self.parser.add_argument('-i', '--input_image', default='input.jpg')
         self.parser.add_argument('-o', '--output_image', default='output.jpg')
         self.parser.add_argument('-te', '--rgb_text', type=tuple_type, default='(255,255,0')
@@ -56,8 +56,9 @@ class Application(object):
     def draw_on_image(self, args):
         self.statistics.reset()
         self.traces.reset()
-        for fitfile in glob.glob(f"{args['fitfile']}"):
-            self.append_statistic_from_fit_file(fitfile)
+        for file in args['fitfile']:
+            for fitfile in glob.glob(f"{file}"):
+                self.append_statistic_from_fit_file(fitfile)
         
         image = SportImage(self.statistics, self.traces, 
                             text_color=args['text_color'],
@@ -76,16 +77,20 @@ def create_file_path(directory, filename, check=True):
     return None
     
 if __name__ == '__main__':
+    files = list()
     app = Application()
     args = app.parse_args()
     if args.statistics:
         app.display_statistics(dict(directory=args.directory))
     if args.generate_image:
-        fitfile = create_file_path(args.directory,args.fitfile)
+        for fitfile in args.fitfile:
+            fp = create_file_path(args.directory, fitfile)
+            if fp is not None:
+                files.append(fp)
         input_image = create_file_path(args.directory,args.input_image)
         output_image = create_file_path(args.directory,args.output_image, check=False)
-        if (output_image is not None) and (input_image is not None) and (fitfile is not None):
-            app.draw_on_image(dict(fitfile=fitfile,
+        if (output_image is not None) and (input_image is not None) and (len(files)>0):
+            app.draw_on_image(dict(fitfile=files,
                         input=input_image,
                         output=output_image,
                         map=args.generate_map,

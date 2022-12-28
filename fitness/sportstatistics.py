@@ -1,6 +1,6 @@
-from .utils import name_of_month
+from .utils import name_of_month, speed_to_min_km
 from collections import Counter, OrderedDict, defaultdict
-
+import datetime
 
 class SportStatistics(object):
     def __init__(self) -> None:
@@ -16,12 +16,11 @@ class SportStatistics(object):
         self.sessions = list()
 
     def add_session(self, session) -> None:
-        dates = [s.start_day for _,s in self.sessions]
-        if session.start_day not in dates:
-            self.sessions.append((session.sport,session))
+        self.sessions.append((session.sport,session))
 
     def get_number_days(self, sessions) -> int:
-        return len(sessions)
+        days = set([s.start_day for s in sessions])
+        return len(days)
     
     def get_numbers_per_month(self, sessions):
         count = Counter((y,m) for y,m,_ in (s.start_day for s in sessions))
@@ -49,19 +48,30 @@ class SportStatistics(object):
     
     @property
     def total_time(self):
-        return self.sessions[0][1].total_time
+        mysum = datetime.timedelta()
+        for h,m,s in [s.total_time for _,s in self.sessions]:
+            d = datetime.timedelta(hours=int(h), minutes=m, seconds=s)
+            mysum += d
+        
+        days = mysum.days
+        hours = mysum.seconds//3600 + days * 24
+        minutes = (mysum.seconds//60)%60
+        seconds = mysum.seconds - hours*3600 - minutes*60
+        return hours, minutes, seconds
     
     @property
     def distance(self):
-        return self.sessions[0][1].distance_in_km
+        return sum(s.distance_in_km for _,s in self.sessions)
     
     @property
     def tempo(self):
-        return self.sessions[0][1].speed_min_km
+        som = sum(s.average_speed for _,s in self.sessions)
+        length = len(self.sessions)
+        return speed_to_min_km(som/length)
     
     @property
     def ascent(self):
-        return self.sessions[0][1].ascent
+        return sum(s.ascent for _,s in self.sessions)
 
     def __detailed_overview(self, sessions) -> list:
         s = list()

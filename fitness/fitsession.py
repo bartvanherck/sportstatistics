@@ -1,5 +1,7 @@
 from datetime import timedelta
 from enum import Enum
+from .utils import speed_to_min_km
+
 
 class FitDataType(Enum):
     SESSION = 1
@@ -25,10 +27,7 @@ class FitSession(object):
 
     @property
     def speed_min_km(self):
-        total = 1000/self.average_speed
-        minute = int(total/60)
-        seconds = int(total) - minute * 60
-        return minute, seconds 
+        return speed_to_min_km(self.average_speed)
 
     @property
     def total_time(self):
