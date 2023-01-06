@@ -31,6 +31,7 @@ class Application(object):
         self.parser.add_argument('-tr', '--rgb_track', type=tuple_type, default='(255,255,0')
         self.parser.add_argument('-fx', '--offset_x', default=30, type=int)
         self.parser.add_argument('-fy', '--offset_y', default=30, type=int)
+        self.parser.add_argument('-r', '--rotate', default=0, type=int)
         self.parser.add_argument('-st', '--max_trace_size', default=400, type=int)
         self.parser.add_argument('-m', '--generate_map', action='store_true')
 
@@ -62,7 +63,8 @@ class Application(object):
         
         image = SportImage(self.statistics, self.traces, 
                             text_color=args['text_color'],
-                            track_color=args['track_color'])
+                            track_color=args['track_color'],
+                            rotate=args["rotate"])
         image.draw(args['input'], args['output'],
                     args['offsets'], args['map'],
                     args['max_trace_size'])
@@ -97,7 +99,8 @@ if __name__ == '__main__':
                         text_color=args.rgb_text,
                         track_color=args.rgb_track,
                         offsets=dict(x=args.offset_x, y=args.offset_y),
-                        max_trace_size=args.max_trace_size
+                        max_trace_size=args.max_trace_size,
+                        rotate=args.rotate
                     ))
         else:
             print("One of the following files does not exist")

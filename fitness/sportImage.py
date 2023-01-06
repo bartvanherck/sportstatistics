@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
 
 class SportImage(object):
-    def __init__(self, statistics, traces, text_color=(0,0,0), track_color=(0,0,0)) -> None:
+    def __init__(self, statistics, traces, text_color=(0,0,0), track_color=(0,0,0), rotate=0) -> None:
         self.statistics = statistics
         self.traces = traces
         self.font_title = ImageFont.truetype('Ubuntu-R.ttf', 35)
@@ -10,6 +10,7 @@ class SportImage(object):
         self.track_color = track_color
         self.width = 1200
         self.height = 900
+        self.rotate = rotate
         self.horizontal = True
         self.coords = [20,15]
 
@@ -66,11 +67,12 @@ class SportImage(object):
         else:
             self.coords[1] += 120
         
-    def normalize(self, image, rotate=False):
+    def normalize(self, image):
         self.calculate_normalized_image_sizes(image)
         img = image.resize((self.width, self.height), Image.Resampling.LANCZOS)
-        if rotate:
-            return img.rotate(180)
+        if self.rotate != 0:
+            print(f"rotate please for {self.rotate} degrees")
+            return img.rotate(self.rotate)
         return img
     
     def calculate_normalized_image_sizes(self, image):
