@@ -72,7 +72,7 @@ class SportImage(object):
         img = image.resize((self.width, self.height), Image.Resampling.LANCZOS)
         if self.rotate != 0:
             print(f"rotate please for {self.rotate} degrees")
-            return img.rotate(self.rotate)
+            return img.rotate(self.rotate,  Image.NEAREST, expand=1)
         return img
     
     def calculate_normalized_image_sizes(self, image):
